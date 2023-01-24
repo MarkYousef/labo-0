@@ -3,29 +3,37 @@ import { assert } from 'console';
 import 'jest-extended';
 import 'jest-extended';
 import { readFileSync } from 'fs';
+import { jeuRoutes } from "../../../src/routes/jeuRouter";
 const path = require('path');
+import supertest from 'supertest';
+import app from '../../../src/app'
 
-let content = ""
+const nom1 = "Mo";
+const nom2 = "Sam";
+const request = supertest(app)
+
 beforeAll(async() => {
-  const filename = path.join('src', 'routes', 'redemarrerJeu.ts')
-  content = readFileSync(filename, 'utf-8');
+  jeuRoutes.controleurJeu.demarrerJeu(nom1);
+  jeuRoutes.controleurJeu.demarrerJeu(nom2);
 });
 
-describe('redemarrerJeu.test.ts', () => {
-  it("should implement test", async () => {
-    throw new Error("Ce test n'a pas été défini")
+describe('GET /api/v1/jeu/redemarrerJeu', () => {
+  
+  it("Verification de 2 joueurs", async () => {
+    const joueursJSON = jeuRoutes.controleurJeu.joueurs;
+    const joueursArray = JSON.parse(joueursJSON);
+    expect(joueursArray.length).toBe(2);
   });
+
+  it("validation du succes de loperation", async () => {
+    const response = await request.get('/api/v1/jeu/redemarrerJeu');
+    expect(response.status).toBe(200);
+  });
+
+  it("aucun joueur", async () => {
+    const joueursJSON = jeuRoutes.controleurJeu.joueurs;
+    const joueursArray = JSON.parse(joueursJSON);
+    expect(joueursArray.length).toBe(0);
 });
 
-describe('redemarrerJeu.test.ts', () => {
-  it("should contain \"get('/api/v1/jeu/redemarrerJeu')\"", () => {
-    expect(content.includes("get('/api/v1/jeu/redemarrerJeu')")).toBeTruthy();
-  });
-
-  it("devrait contenir un test pour jouer qui retourne 404 (après redemarrerJeu()", () => {
-    expect(content.includes(".status).toBe(200)")).toBeTruthy();
-    expect(content.includes(".response).toBe(JSON)")).toBeTruthy();
-  });
 });
-
-
